@@ -24,7 +24,7 @@ from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
-
+from launch.actions import ExecuteProcess
 
 def generate_launch_description():
 
@@ -36,6 +36,18 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_gazebo_ros, 'launch', 'gazebo.launch.py'),
         )
+    )
+
+     # Execute node with default on_exit if the node is not required
+    gzserver = ExecuteProcess(
+        cmd = ['gzserver'],
+        output='screen',
+        shell=True,
+    )
+
+    gzclient = ExecuteProcess(
+        cmd = ['gzclient'],
+        output="screen"
     )
 
     # Follow node
@@ -64,7 +76,8 @@ def generate_launch_description():
           description='SDF world file'),
         DeclareLaunchArgument('rviz', default_value='true',
                               description='Open RViz.'),
-        gazebo,
+        gzserver,
+        gzclient,
         follow,
         rviz
     ])
